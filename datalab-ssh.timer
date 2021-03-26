@@ -1,5 +1,5 @@
 [Unit]
-Description=Run datalab-ssh every 17 minutes
+Description=Run datalab-ssh regularly
 Requires=datalab-ssh.service
 
 [Timer]

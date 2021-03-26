@@ -12,8 +12,8 @@ echo "Running ssh management to check it works..."
 "$target/ssh.py"
 
 # ensure the service and timer are set up
-systemctl enable $target/datalab-ssh.timer
-systemctl enable $target/datalab-ssh.service
+systemctl enable "$target/datalab-ssh.timer"
+systemctl enable "$target/datalab-ssh.service"
 systemctl stop datalab-ssh.service
 systemctl stop datalab-ssh.timer
 systemctl daemon-reload

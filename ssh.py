@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import pwd
 import subprocess
 import sys
@@ -7,14 +8,14 @@ from pathlib import Path
 
 import requests
 
-USERFILE = "https://github.com/ebmdatalab/ssh/blob/main/passwd"
+USERFILE = "https://raw.githubusercontent.com/ebmdatalab/ssh/main/passwd"
 session = requests.Session()
 
 
 def user_exists(user):
     try:
         user_info = pwd.getpwnam(user)
-        return user_info
+        return Path(user_info.pw_dir) / ".ssh/authorized_keys"
     except KeyError:
         return None
 
@@ -24,7 +25,7 @@ def create_user(user):
         ["useradd", user, "--create-home", "--shell", "/bin/bash"],
         check=True,
     )
-    return pwd.getpwnam(user)
+    return user_exists(user)
 
 
 def get_fingerprint(key):
@@ -43,7 +44,6 @@ def get_fingerprint(key):
 def get_github_key(user, fingerprint):
     """Get Github user's key that matches fingerprint."""
     # Do not use the api to avoid ratelimiting
-    # Note: Github strips key comments :(
     r = session.get(f"https://github.com/{user}.keys")
     r.raise_for_status()
 
@@ -53,41 +53,75 @@ def get_github_key(user, fingerprint):
             return key
 
 
-def write_authorized_keys(home, key):
-    authorized_keys = Path(home) / ".ssh/authorized_keys"
-    authorized_keys.parent.mkdir(exist_ok=True)
-    authorized_keys.write_text(key)
-    print(f"added keys to {authorized_keys}")
+def write_file(path, contents):
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(contents)
 
 
 def manage_user(user, fingerprint):
-    user_info = user_exists(user)
+    auth_keys = user_exists(user)
     key = get_github_key(user, fingerprint)
     if key:
-        if not user_info:
-            user_info = create_user(user)
-        write_authorized_keys(user_info.pw_dir, key)
+        if not auth_keys:
+            auth_keys = create_user(user)
+        write_file(auth_keys, key)
     else:
         # remove all keys from users authorized_keys
         if user_info:
-            write_authorized_keys(user_info.pw_dir, "")
+            write_file(auth_keys, "")
             print(f"Removing all keys for user {user}")
         else:
             print(f"No valid key found for user {user}")
 
 
-def run(users="passwd"):
+def validate_user(user, fingerprint):
+    auth_keys = user_exists(user)
+    key = get_github_key(user, fingerprint)
+
+    if auth_keys:
+        if key:
+            if get_fingerprint(auth_keys.read_text()) == fingerprint:
+                print(f"User {user} has valid authorized_keys")
+                return True
+            else:
+                print(f"User {user} has invalid authorized_keys!")
+        else:
+            print(f"User {user} exists but is not expected")
+    else:
+        print(f"User {user} is expected but does not exist on system")
+
+    return False
+
+
+def get_users(lines):
+    for i, line in enumerate(lines.splitlines()):
+        if not line or line[0] == "#":
+            continue
+
+        # split on first ':'
+        user, _, fingerprint = line.partition(":")
+
+        if not fingerprint:
+            print(f"Invalid line '{line}' in users file")
+        else:
+            yield user, fingerprint
+
+
+def run(args):
+    # TODO: not just rely on Github's https certificate for trust here
     r = session.get(USERFILE)
     r.raise_for_status()
-    # TODO: not just rely on Github's https certificate here.
-    text = Path("passwd").read_text()
+    lines = r.text
 
     return_code = 0
-    for line in text.splitlines():
+    for user, fingerprint in get_users(lines):
         try:
-            # split on first ':'
-            user, _, fingerprint = line.partition(":")
-            manage_user(user, fingerprint)
+            if args.validate:
+                valid = validate_user(user, fingerprint)
+                if not valid:
+                    return_code = 1
+            else:
+                manage_user(user, fingerprint)
         except Exception as exc:
             # do not exit, move on to next user
             traceback.print_exc()
@@ -96,5 +130,14 @@ def run(users="passwd"):
     return return_code
 
 
+parser = argparse.ArgumentParser("ssh management")
+parser.add_argument(
+    "--validate",
+    action="store_true",
+    help="Do not create users, but validate against input",
+)
+
+
 if __name__ == "__main__":
-    sys.exit(run())
+    args = parser.parse_args()
+    sys.exit(run(args))
