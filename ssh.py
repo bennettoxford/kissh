@@ -93,8 +93,9 @@ def validate_user(user, fingerprint):
     return False
 
 
-def get_users(lines):
-    for i, line in enumerate(lines.splitlines()):
+def get_users(path):
+    user_lines = path.read_text().splitlines()
+    for i, line in enumerate(user_lines):
         if not line or line[0] == "#":
             continue
 
@@ -108,13 +109,9 @@ def get_users(lines):
 
 
 def run(args):
-    # TODO: not just rely on Github's https certificate for trust here
-    r = session.get(USERFILE)
-    r.raise_for_status()
-    lines = r.text
-
+    userfile = Path(args.users)
     return_code = 0
-    for user, fingerprint in get_users(lines):
+    for user, fingerprint in get_users(userfile):
         try:
             if args.validate:
                 valid = validate_user(user, fingerprint)
@@ -131,6 +128,7 @@ def run(args):
 
 
 parser = argparse.ArgumentParser("ssh management")
+parser.add_argument("users", nargs="?", default="passwd", help="users file to use")
 parser.add_argument(
     "--validate",
     action="store_true",

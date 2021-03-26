@@ -1,4 +1,5 @@
 TEST_IMAGE=ssh-test
+TESTS=$(shell ls tests/*.sh)
 export TEST=true
 
 # disable default rules
@@ -27,7 +28,6 @@ test: $(TESTS)
 
 
 # run specific test
-TESTS=$(shell ls tests/*.sh)
 .PHONY: $(TESTS)
 $(TESTS): .test-image
 	./run-test.sh $@

@@ -97,3 +97,21 @@ commit and push changes made to repos on those remote machines.
 To do so safely, you should temporarily re-connect with agent forwarding
 enabled (`ssh -A ...`), then exit and go back to regular non-forwarded ssh
 connection afterwards.
+
+
+## This project
+
+
+We use docker to simulate a system to run on.
+
+To run all tests:
+
+    make test
+
+To run specific test:
+
+    make tests/basic.sh
+
+To run test and drop into shell after run:
+
+    make tests/basic.sh DEBUG=1
