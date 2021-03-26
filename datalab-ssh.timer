@@ -1,0 +1,9 @@
+[Unit]
+Description=Run datalab-ssh every 17 minutes
+Requires=datalab-ssh.service
+
+[Timer]
+OnActiveSec=17m
+
+[Install]
+WantedBy=timers.target

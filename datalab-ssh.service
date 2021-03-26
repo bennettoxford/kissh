@@ -1,0 +1,13 @@
+[Unit]
+Description=Runs Datalab ssh key management scripts
+Wants=datalab-ssh.timer
+
+[Service]
+WorkingDirectory=/srv/ssh
+# update before running, the - prefix means do not block if we fail
+ExecStartPre=-git pull https://github.com/ebmdatalab/ssh
+ExecStart=/srv/ssh/ssh.py
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
