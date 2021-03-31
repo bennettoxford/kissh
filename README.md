@@ -47,8 +47,8 @@ added:
 
     ./add.py YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519
 
-This is should update your user and key fingerprint in the `passwd` file,
-marking this key as your current Datalab key.
+This is should ensure your user has a correct entry with key fingerprint in the
+`passwd` file, marking this key as your current Datalab key.
 
 You need to add and commit this, but you MUST sign it with your registered
 Github GPG key, or else the commit will be blocked.
@@ -76,13 +76,16 @@ This should allow you to just do `ssh somehost.embdatalab.net` and it Just Works
 
 If your key is ever compromised (e.g. your computer is stolen or hacked), you
 should inform Simon or Tom W ASAP, and immediately remove the public key from
-your Github account, and also this repo. Either of these actions will cause the
-key to be removed from our various systems within a short window.
+your Github account, and also the fingerprint from this repo. Either of these
+actions will cause the key to be removed from our various systems within
+a short window. You can then add a new key as above.
 
-You can always add a new key at any time by generating it as above, and adding
-it to Github and the fingerprint to this repo as described. You can then remove
-the old key, and it will be removed from our systems.  You are encouraged to
-rotate your keys at least once every 12 months, ideally more regularly.
+
+You are encouraged to rotate your keys at least once every 12 months, ideally
+more regularly.  You can rotate your key by generating it as above, and adding
+it to Github and updating the fingerprint in this repo as described. After
+a short while, your old key will be removed from our systems and your new key added.
+You can then remove the old key from your github account.
 
 
 ## SSH Agents and Forwarding
@@ -99,10 +102,10 @@ enabled (`ssh -A ...`), then exit and go back to regular non-forwarded ssh
 connection afterwards.
 
 
-## This project
+## Tests
 
 
-We use docker to simulate a system to run on.
+We use docker to simulate a system to run on in test.
 
 To run all tests:
 
@@ -112,6 +115,6 @@ To run specific test:
 
     make tests/basic.sh
 
-To run test and drop into shell after run:
+To run test and drop into shell after running:
 
     make tests/basic.sh DEBUG=1

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 import ssh
@@ -14,27 +12,11 @@ def run(user, keyfile, userfile=Path("passwd")):
         print(f"{keyfile} is not registerd for Github user {user}")
         return 1
 
-    users = userfile.read_text()
-    tmp = Path(".tmp_passwd")
-
-    written = False
-    new_line = f"{user}:{fingerprint}\n"
-    try:
-        with tmp.open("w") as f:
-            for line in users.splitlines():
-                if line.startswith(user + ":"):
-                    f.write(new_line)
-                    written = True
-                else:
-                    f.write(line + "\n")
-
-            if not written:
-                f.write(new_line)
-
-        tmp.rename(userfile)
-    finally:
-        if tmp.exists():
-            tmp.unlink()
+    users = dict(ssh.get_users(userfile))
+    # update user's fingerprint
+    users[user] = fingerprint
+    content = "\n".join(f"{u}:{f}" for u, f in users.items())
+    ssh.write_file(userfile, content)
 
 
 if __name__ == "__main__":
