@@ -21,10 +21,12 @@ def user_exists(user):
 
 
 def create_user(user):
-    subprocess.run(
-        ["useradd", user, "--create-home", "--shell", "/bin/bash"],
-        check=True,
-    )
+    subprocess.run(["adduser", user, "--gecos=''", '--disabled-password'], check=True)
+    subprocess.run(["adduser", user, "sudo"], check=True)
+    # force password set on first ssh login, by deleting and expiring their
+    # passwd
+    subprocess.run(["passwd", "-de", user], check=True)
+
     return user_exists(user)
 
 

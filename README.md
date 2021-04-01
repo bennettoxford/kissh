@@ -56,6 +56,22 @@ Github GPG key, or else the commit will be blocked.
 Once this is reviewed and merged, after a short time your account and key
 should be available to log in with on all our servers.
 
+## Sudo Access and Passwords
+
+By default, all of the tech team at the Datalab have sudo access on all our
+infra. However, you do need a password set to use sudo.
+
+For each server, the first time you log in via SSH, you will need to set
+a password. It should be a strong password, but bear in mind you will need to
+type it in by hand, most likley. It makes sense to reuse the same password
+across multiple servers, but it's not required.
+
+If you ever lose or forget your password, you can as one of the team to run the
+following:
+
+    sudo passwd -de YOUR_GITHUB_USERNAME
+
+This will delete your password and force a reset next time you SSH in.
 
 ## Local SSH Config
 
@@ -98,7 +114,7 @@ You may occasionally need to use your SSH key on a remote server, e.g. to
 commit and push changes made to repos on those remote machines.
 
 To do so safely, you should temporarily re-connect with agent forwarding
-enabled (`ssh -A ...`), then exit and go back to regular non-forwarded ssh
+enabled (`ssh -A ...`), then exit and go back to regular non-forwarded SSH
 connection afterwards.
 
 
