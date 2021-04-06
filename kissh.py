@@ -8,7 +8,6 @@ from pathlib import Path
 
 import requests
 
-USERFILE = "https://raw.githubusercontent.com/ebmdatalab/ssh/main/passwd"
 session = requests.Session()
 
 

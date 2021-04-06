@@ -1,0 +1,10 @@
+[Unit]
+Description=Run kissh service regularly
+Requires=kissh.service
+
+[Timer]
+# prime number to avoid synchronisation
+OnActiveSec=17m
+
+[Install]
+WantedBy=timers.target

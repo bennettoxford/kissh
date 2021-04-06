@@ -1,9 +1,0 @@
-[Unit]
-Description=Run datalab-ssh regularly
-Requires=datalab-ssh.service
-
-[Timer]
-OnActiveSec=17m
-
-[Install]
-WantedBy=timers.target

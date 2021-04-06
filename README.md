@@ -1,8 +1,9 @@
-# Datalab SSH Policy
+# KISSH: Keep It Simple SSH
 
-NOTE: (2021-03-24) this is a draft of our new policy, and is not enforced yet,
-but you should go ahead and create keys in advance of the new policy coming
-into effect. Policy should start to be the only way sometime in April 2021.
+NOTE: (2021-03-24) this is a draft of our ssh policy and tooling, and is not
+enforced yet, but you should go ahead and create keys in advance of the new
+policy coming into effect. Policy should start to be the only way sometime in
+April 2021.
 
 We use SSH as primary access to all our Datalab infrastructure and as well as
 parts of the OpenSAFELY backend infrastructure. We also use it for Github
@@ -37,7 +38,7 @@ account:
 Github doesn't preserve the key comment, so we recommend titling the key with
 the comment, e.g.
 
-     YOURRMAIL@thedatalab.org:202X-XX-XX
+     YOUREMAIL@thedatalab.org:202X-XX-XX
 
 
 ## Confirm your Key
@@ -59,15 +60,17 @@ should be available to log in with on all our servers.
 ## Sudo Access and Passwords
 
 By default, all of the tech team at the Datalab have sudo access on all our
-infra. However, you do need a password set to use sudo.
+infrastructure. We do not enabled passwordless sudo however - you need to set
+a password.
 
 For each server, the first time you log in via SSH, you will need to set
 a password. It should be a strong password, but bear in mind you will need to
-type it in by hand, most likley. It makes sense to reuse the same password
-across multiple servers, but it's not required.
+type it in by hand, most likley. It is acceptable to reuse the same password
+across multiple server - the main purpose is to require a password for sudo
+usage.
 
-If you ever lose or forget your password, you can as one of the team to run the
-following:
+If you ever lose or forget your password for a server, you can ask one of the
+tech team to run the following on that server:
 
     sudo passwd -de YOUR_GITHUB_USERNAME
 
@@ -118,10 +121,28 @@ enabled (`ssh -A ...`), then exit and go back to regular non-forwarded SSH
 connection afterwards.
 
 
+## The kissh agent
+
+To install kissh on a machine, you will need git installed. Checkout this
+repository, then run:
+
+    ./install.sh
+
+This will install this repo in /srv/kissh, and set up a systemd timer to run
+the agent periodically. When run, the kissh agent will ensure users and keys
+are up to date, creating new users if necessary. It will never remove users,
+only their keys. It ensures that **only** the keys approved in this repo are
+installed - all other SSH keys will be removed, by design.
+
+Before running, the kissh service will update itself to a clean checkout of the
+main branch of the repo, in order to get new user and keys info, as well as
+update itself to the latest version. It will discard any local changes, by
+design.
+
+
 ## Tests
 
-
-We use docker to simulate a system to run on in test.
+We use docker to simulate a clean system to run on in test.
 
 To run all tests:
 

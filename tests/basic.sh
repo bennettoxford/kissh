@@ -5,12 +5,12 @@ set -euo pipefail
 
 sleep 1
 
-/srv/ssh/ssh.py --validate
+/srv/kissh/kissh.py --validate
 
-systemctl status datalab-ssh.timer
+systemctl status kissh.timer
 
 # because datalab-ssh is Type: oneshot, systemctl status will exit with a 3 (not running)
-systemctl is-enabled datalab-ssh.service
+systemctl is-enabled kissh.service
 set +e
-systemctl status datalab-ssh.service
+systemctl status kissh.service
 test $? = 3
