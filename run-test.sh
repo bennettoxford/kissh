@@ -12,9 +12,14 @@
 #
 set -euo pipefail
 SCRIPT=$1
-LOG=$SCRIPT.log
 TEST_IMAGE=ssh-test
 DEBUG=${DEBUG:-}
+
+if test -n "$DEBUG"; then
+    LOG=/dev/stdout
+else
+    LOG=$SCRIPT.log
+fi
 
 # Launch a container running systemd
 CONTAINER="$(
@@ -34,6 +39,9 @@ success=$?
 set -e
 if test $success -eq 0; then
     echo "SUCCESS"
+elif test -n "$DEBUG"; then
+    echo "Running bash inside container (container will be deleted on exit)"
+    docker exec -it -e TEST=true -w /tests "$CONTAINER" bash
 else
     echo "FAILED - output logged to $LOG"
     echo "### $1 ###"
@@ -44,13 +52,5 @@ else
         cat "$LOG"
     fi
     echo "### $1 ###"
-fi
-
-if test -n "$DEBUG"; then
-    cat "$LOG"
-    echo "Running bash inside container (container will be deleted on exit)"
-    docker exec -it -e TEST=true -w /tests "$CONTAINER" bash
-else
     exit $success
 fi
-
