@@ -9,7 +9,7 @@ cp -a . "$target"
 
 # initial run to check it works
 echo "Running ssh management to check it works..."
-"$target/kissh.py"
+"$target/kissh" apply
 
 # ensure the service and timer are set up
 systemctl enable "$target/kissh.timer"

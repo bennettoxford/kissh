@@ -22,7 +22,7 @@ the key's comment.
 
 To generate such a key, you can run this in a terminal:
 
-    ssh-keygen -t ed25519 -C "YOUREMAIL@thedatalab.org:$(date --iso-8601)" ~/.ssh/datalab_ed25519
+    ssh-keygen -t ed25519 -C "YOUREMAIL@thedatalab.org:$(date --iso-8601)" -f ~/.ssh/datalab_ed25519
 
 Note: you MUST enter a strong password when prompted.
 
@@ -46,7 +46,7 @@ the comment, e.g.
 Clone this repo and run the following to a ensure your new keys fingerprint is
 added:
 
-    ./add.py YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519
+    ./kissh update YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519
 
 This is should ensure your user has a correct entry with key fingerprint in the
 `passwd` file, marking this key as your current Datalab key.
@@ -139,6 +139,10 @@ main branch of the repo, in order to get new user and keys info, as well as
 update itself to the latest version. It will discard any local changes, by
 design.
 
+The kissh agent has help text:
+
+    ./kissh --help
+
 
 ## Tests
 
@@ -150,8 +154,8 @@ To run all tests:
 
 To run specific test:
 
-    make tests/basic.sh
+    make tests/install.sh
 
 To run test and drop into shell after running:
 
-    make tests/basic.sh DEBUG=1
+    make tests/install.sh DEBUG=1

@@ -8,7 +8,7 @@ WorkingDirectory=/srv/kissh
 # version is merged!
 #ExecStartPre=git reset --hard
 #ExecStartPre=git pull https://github.com/ebmdatalab/kissh
-ExecStart=/srv/kissh/kissh.py
+ExecStart=/srv/kissh/kissh apply
 Type=oneshot
 
 [Install]

@@ -5,7 +5,7 @@ set -euo pipefail
 
 sleep 1
 
-/srv/kissh/kissh.py --validate
+/srv/kissh/kissh validate
 
 systemctl status kissh.timer
 

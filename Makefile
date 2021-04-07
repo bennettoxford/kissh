@@ -1,4 +1,4 @@
-TEST_IMAGE=ssh-test
+TEST_IMAGE=kissh-test
 TESTS=$(shell ls tests/*.sh)
 export TEST=true
 
