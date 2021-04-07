@@ -9,7 +9,7 @@ export TEST=true
 .PHONY: lint
 lint:
 	shellcheck *.sh 
-	black --check *.py
+	black --check kissh
 
 
 # proxy file to track image needing to be rebuilt

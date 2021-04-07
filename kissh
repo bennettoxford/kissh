@@ -39,6 +39,7 @@ def load_history():
 
 class User:
     """Simple local user class."""
+
     def __init__(self, username):
         self.info = pwd.getpwnam(username)
         self.username = username
@@ -59,7 +60,9 @@ class User:
 
     @classmethod
     def create(cls, username):
-        subprocess.run(["adduser", username, "--gecos=''", "--disabled-password"], check=True)
+        subprocess.run(
+            ["adduser", username, "--gecos=''", "--disabled-password"], check=True
+        )
         subprocess.run(["adduser", username, "sudo"], check=True)
         # force password setting on first ssh login, by deleting and expiring their
         # passwd
