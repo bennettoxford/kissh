@@ -65,7 +65,7 @@ a password.
 
 For each server, the first time you log in via SSH, you will need to set
 a password. It should be a strong password, but bear in mind you will need to
-type it in by hand, most likley. It is acceptable to reuse the same password
+type it in by hand, most likely. It is acceptable to reuse the same password
 across multiple server - the main purpose is to require a password for sudo
 usage.
 

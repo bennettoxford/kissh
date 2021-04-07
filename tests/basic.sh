@@ -9,7 +9,7 @@ sleep 1
 
 systemctl status kissh.timer
 
-# because datalab-ssh is Type: oneshot, systemctl status will exit with a 3 (not running)
+# because kissh.service is Type: oneshot, systemctl status will exit with a 3 (not running)
 systemctl is-enabled kissh.service
 set +e
 systemctl status kissh.service
