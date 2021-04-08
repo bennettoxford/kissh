@@ -50,6 +50,9 @@ class User:
         self.authorized_keys.parent.mkdir(exist_ok=True)
         self.authorized_keys.write_text(contents)
 
+    def __str__(self):
+        return self.username
+
     @classmethod
     def load(cls, username):
         """Tests whether user exists."""
