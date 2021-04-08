@@ -12,7 +12,7 @@
 #
 set -euo pipefail
 SCRIPT=$1
-TEST_IMAGE=ssh-test
+TEST_IMAGE=kissh-test
 DEBUG=${DEBUG:-}
 
 if test -n "$DEBUG"; then
