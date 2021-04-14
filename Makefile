@@ -1,6 +1,5 @@
-TEST_IMAGE=kissh-test
 TESTS=$(shell ls tests/*.sh)
-export TEST=true
+DISTRO=ubuntu
 
 # disable default rules
 .SUFFIXES:
@@ -11,23 +10,24 @@ lint:
 	shellcheck *.sh 
 	black --check kissh
 
-
-# proxy file to track image needing to be rebuilt
-.test-image: Dockerfile
-	docker build . -t $(TEST_IMAGE)
-	touch $@
-
-
-.PHONY: test-image
-test-image: .test-image
+.PHONY: ubuntu-kissh-test-image debian-kissh-test-image
+kissh-test-image-ubuntu:
+	docker build . -t $@ --build-arg BASE=jrei/systemd-ubuntu:20.04
+kissh-test-image-debian:
+	docker build . -t $@ --build-arg BASE=jrei/systemd-debian:9
 
 
 # run all tests
 .PHONY: test
-test: $(TESTS)
+test: kissh-test-image-ubuntu kissh-test-image-debian
+	$(MAKE) $(TESTS) DISTRO=ubuntu
+	$(MAKE) $(TESTS) DISTO=debian
 
 
-# run specific test
 .PHONY: $(TESTS)
-$(TESTS): .test-image
-	./run-test.sh $@
+$(TESTS): 
+	./run-test.sh $@ kissh-test-image-$(DISTRO)
+
+
+clean:
+	docker rmi kissh-test-image-ubuntu kissh-test-image-debian

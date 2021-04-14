@@ -5,14 +5,9 @@
 # Run with DEBUG=1 to run a shell inside the container after running your
 # script
 # 
-# Note: you may need to first build the test image before you can manually run
-# this script:
-#     
-#     make test-image
-#
 set -euo pipefail
 SCRIPT=$1
-TEST_IMAGE=kissh-test
+TEST_IMAGE=$2
 DEBUG=${DEBUG:-}
 
 if test -n "$DEBUG"; then

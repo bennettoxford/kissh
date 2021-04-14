@@ -14,19 +14,8 @@
 #   --tmpfs /tmp --tmpfs /run --tmpfs /run/lock \
 #   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 #
-# We also pre-install our packages, so that tests run faster.
-FROM ubuntu:20.04
+ARG BASE=jrei/systemd-ubuntu:20.04
+FROM $BASE
 
-ENV container=docker
-ENV LC_ALL=C
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN sed -i 's/# deb/deb/g' /etc/apt/sources.list
-
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y ubuntu-server sudo ssh openssh-server
-
-VOLUME [ "/sys/fs/cgroup" ]
-
-CMD ["/lib/systemd/systemd"]
+# we need sudo and ssh installed
+RUN apt-get update && apt-get install -y sudo ssh openssh-server python3 python3-requests

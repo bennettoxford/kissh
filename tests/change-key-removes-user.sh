@@ -3,7 +3,11 @@ set -euo pipefail
 
 tmp=/root/tmp
 mkdir -p $tmp
-trap 'rm -rf $tmp; kill -- -$$' EXIT
+cleanup() {
+    kill -9 $server_pid || true
+    rm -rf $tmp
+}
+trap cleanup EXIT
 
 # create an empty userfile
 userfile=$tmp/passwd
@@ -18,7 +22,8 @@ ssh-keygen -t ed25519 -C "test" -N "" -f "$key"
 test -f "$public"
 
 # serve the file up over http
-python3 -m http.server 8080 --directory "$tmp" &
+(cd "$tmp" && python3 -m http.server 8080)&
+server_pid=$!
 
 # set kissh to user our test data
 export KISSH_USERFILE=$userfile
@@ -50,3 +55,4 @@ echo "$username:SHA256:badfingerprint" > "$userfile"
 
 # check the authorized_keys is empty
 test "$(cat "$authorized_keys")" = ""
+echo "test: $?"

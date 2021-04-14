@@ -21,6 +21,6 @@ jobs:
     - name: Run lint
       run: make lint
     - name: Prepare test image
-      run: make test-image
+      run: make kissh-test-image-ubuntu kissh-test-image-debian
     - name: Run tests
       run: make test
