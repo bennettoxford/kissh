@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+import argparse
+from datetime import datetime
+import pwd
+import os
+import subprocess
+import sys
+import traceback
+from pathlib import Path
+
+import requests
+
+session = requests.Session()
+
+# overridable by env var so that we can test
+KEY_URL = os.environ.get("KISSH_KEY_URL", "https://github.com/{user}.keys")
+
+
+# Record users kissh has created on this machine. We use this to nuke the
+# authorized_keys of users that are no longer in the userfile.
+HISTORY = Path("/root/.kissh-history")
+
+
+def write_history(username):
+    """Record username and creation timestamp."""
+    with HISTORY.open("a") as history:
+        history.write(f"{username}:{datetime.utcnow().isoformat()}\n")
+
+
+def load_history():
+    """Load and parse the history file."""
+    try:
+        for line in HISTORY.read_text().splitlines():
+            user, _, date = line.strip().partition(":")
+            yield user, date
+    except FileNotFoundError:
+        return
+
+
+class User:
+    """Simple local user class."""
+
+    def __init__(self, username):
+        self.info = pwd.getpwnam(username)
+        self.username = username
+        self.authorized_keys = Path(self.info.pw_dir) / ".ssh/authorized_keys"
+
+    def write_keys(self, contents):
+        """Write authorized_keys file contents, ensuring .ssh exists."""
+        self.authorized_keys.parent.mkdir(exist_ok=True)
+        self.authorized_keys.write_text(contents)
+
+    def __str__(self):
+        return self.username
+
+    @classmethod
+    def load(cls, username):
+        """Tests whether user exists."""
+        try:
+            return cls(username)
+        except KeyError:
+            return None
+
+    @classmethod
+    def create(cls, username):
+        subprocess.run(
+            ["adduser", username, "--gecos=''", "--disabled-password"], check=True
+        )
+        subprocess.run(["adduser", username, "sudo"], check=True)
+        # force password setting on first ssh login, by deleting and expiring their
+        # passwd
+        subprocess.run(["passwd", "-de", username], check=True)
+        # record that we know about this user.
+        write_history(username)
+        return cls(username)
+
+
+def get_fingerprint(key):
+    """Given a public key, get its fingerprint."""
+    ps = subprocess.run(
+        ["ssh-keygen", "-l", "-f-"],
+        input=key,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    # ssh-keygen output format is: "SIZE HASH:VALUE no comment (TYPE)".
+    # eg: "256 SHA256:AsFa6mIf22oiMZSW7yNn3Fip2Ri6DAzjrh+KiZ+axWg no comment (ED25519)"
+    return ps.stdout.split()[1]
+
+
+def get_github_key(user, fingerprint):
+    """Get the key for a Github user key that matches given fingerprint."""
+    r = session.get(KEY_URL.format(user=user))
+    r.raise_for_status()
+
+    # Find the correct key by its fingerprint
+    for key in r.text.splitlines():
+        if get_fingerprint(key) == fingerprint:
+            return key
+
+
+def manage_user(username, fingerprint):
+    """Manage this user on this machine.
+
+    Create the user if they have a valid key but do not yet exist.
+
+    If their key is invalid for any reason, wipe their authorized_keys file.
+    """
+    user = User.load(username)
+
+    key = None
+    if fingerprint:
+        key = get_github_key(username, fingerprint)
+
+    if key:
+        # we have a valid key, so we can create the user now if needed
+        if user is None:
+            user = User.create(username)
+        user.write_keys(key + "\n")
+    else:
+        if user:
+            # remove all keys from users authorized_keys
+            user.write_keys("")
+            print(f"Removed SSH keys for user {user}")
+        else:
+            print(f"User {user} does not exist and no valid key found")
+
+
+def validate_user(username, fingerprint, historic_user):
+    user = User.load(username)
+    key = get_github_key(username, fingerprint)
+
+    if user:
+        if key:
+            if get_fingerprint(user.authorized_keys.read_text()) == fingerprint:
+                print(f"User {user} exists has valid authorized_keys")
+                return True
+            else:
+                print(f"User {user} exists but has invalid authorized_keys")
+                return False
+        else:
+            if historic_user:
+                print(f"Historic user {user} exists but does not have valid key")
+                return True
+
+            print(
+                f"User {user} exists but does not have valid key and was not created by kissh"
+            )
+    else:
+        print(f"User {user} is expected but does not exist on system")
+
+    return False
+
+
+def get_users(path):
+    """Read and parse the userfile."""
+    user_lines = path.read_text().splitlines()
+    for i, line in enumerate(user_lines):
+        if not line.strip() or line[0] == "#":
+            continue
+
+        # split on first ':'
+        user, _, fingerprint = line.partition(":")
+
+        if not fingerprint:
+            print(f"Invalid line '{line}' in users file")
+        else:
+            yield user, fingerprint
+
+
+def apply_users(userfile):
+    """Configure the accounts and SSH keys of users."""
+    return_code = 0
+    historic_users = dict(load_history())
+    current_users = dict(get_users(userfile))
+
+    for user, fingerprint in current_users.items():
+        try:
+            manage_user(user, fingerprint)
+        except Exception as exc:
+            # do not exit, move on to next user
+            traceback.print_exc()
+            return_code = 1
+
+    # handle kissh users that have been removed
+    for user in historic_users:
+        try:
+            if user not in current_users:
+                # user has been removed, nuke their keys
+                manage_user(user, None)
+        except Exception as exc:
+            # do not exit, move on to next user
+            traceback.print_exc()
+            return_code = 1
+
+    return return_code
+
+
+def validate_users(userfile):
+    """Validate all kissh users."""
+    return_code = 0
+    history = dict(load_history())
+    for user, fingerprint in get_users(userfile):
+        try:
+            if not validate_user(user, fingerprint, user in history):
+                return_code = 1
+        except Exception as exc:
+            # do not exit, move on to next user
+            traceback.print_exc()
+            return_code = 1
+
+    return return_code
+
+
+def update_user(userfile, user, public_key):
+    """Update a users entry in the userfile if it is valid."""
+    fingerprint = get_fingerprint(Path(public_key).read_text())
+
+    # validate the key is set properly on Github
+    if get_github_key(user, fingerprint) is None:
+        print(f"{keyfile} is not registerd for Github user {user}")
+        return 1
+
+    users = dict(get_users(userfile))
+    # update user's fingerprint
+    users[user] = fingerprint
+    content = "\n".join(f"{u}:{f}" for u, f in users.items())
+    userfile.write_text(content)
+
+
+def get_parser():
+    parser = argparse.ArgumentParser("kissh SSH/user management")
+    parser.add_argument(
+        "--userfile",
+        help="SSH users file to use. Defaults to ./passwd",
+        type=Path,
+        default=Path(os.environ.get("KISSH_USERFILE", "passwd")),
+    )
+
+    subparsers = parser.add_subparsers(
+        title="available commands",
+        required=True,
+        description="",
+        metavar="COMMAND",
+    )
+
+    parser_apply = subparsers.add_parser(
+        "apply",
+        help="Apply keys to local users, creating users if needed.",
+    )
+    parser_apply.set_defaults(func=apply_users)
+
+    parser_validate = subparsers.add_parser(
+        "validate",
+        help="Validate local users are created and have correct keys.",
+    )
+    parser_validate.set_defaults(func=validate_users)
+
+    parser_update = subparsers.add_parser(
+        "update",
+        help="Update users file with user/key pair",
+    )
+    parser_update.add_argument("user", help="Github username")
+    parser_update.add_argument(
+        "public_key", type=Path, help="Path to public key file for user"
+    )
+    parser_update.set_defaults(func=update_user)
+
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_parser()
+    kwargs = vars(parser.parse_args())
+    func = kwargs.pop("func")
+    sys.exit(func(**kwargs))

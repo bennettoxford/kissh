@@ -1,0 +1,15 @@
+[Unit]
+Description=Runs the Datalab's kissh SSH key management script
+Wants=kissh.timer
+
+[Service]
+WorkingDirectory=/srv/kissh
+# Note: these are commented out initially, as they won't work until the initial
+# version is merged!
+#ExecStartPre=git reset --hard
+#ExecStartPre=git pull https://github.com/ebmdatalab/kissh
+ExecStart=/srv/kissh/kissh apply
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
