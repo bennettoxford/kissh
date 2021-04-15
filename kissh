@@ -24,7 +24,12 @@ HISTORY = Path("/root/.kissh-history")
 def write_history(username):
     """Record username and creation timestamp."""
     with HISTORY.open("a") as history:
-        history.write(f"{username}:{datetime.utcnow().isoformat()}\n")
+        history.write(
+            "{username}:{isodate}\n".format(
+                username=username,
+                isodate=datetime.utcnow().isoformat(),
+            )
+        )
 
 
 def load_history():
@@ -81,8 +86,9 @@ def get_fingerprint(key):
         ["ssh-keygen", "-l", "-f-"],
         input=key,
         check=True,
-        capture_output=True,
-        text=True,
+        stderr=subprocess.STDOUT,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
     )
     # ssh-keygen output format is: "SIZE HASH:VALUE no comment (TYPE)".
     # eg: "256 SHA256:AsFa6mIf22oiMZSW7yNn3Fip2Ri6DAzjrh+KiZ+axWg no comment (ED25519)"
@@ -122,9 +128,9 @@ def manage_user(username, fingerprint):
         if user:
             # remove all keys from users authorized_keys
             user.write_keys("")
-            print(f"Removed SSH keys for user {user}")
+            print("Removed SSH keys for user {user}".format(user=user))
         else:
-            print(f"User {user} does not exist and no valid key found")
+            print("User {user} does not exist and no valid key found".format(user=user))
 
 
 def validate_user(username, fingerprint, historic_user):
@@ -134,21 +140,31 @@ def validate_user(username, fingerprint, historic_user):
     if user:
         if key:
             if get_fingerprint(user.authorized_keys.read_text()) == fingerprint:
-                print(f"User {user} exists has valid authorized_keys")
+                print("User {user} exists has valid authorized_keys".format(user=user))
                 return True
             else:
-                print(f"User {user} exists but has invalid authorized_keys")
+                print(
+                    "User {user} exists but has invalid authorized_keys".format(
+                        user=user
+                    )
+                )
                 return False
         else:
             if historic_user:
-                print(f"Historic user {user} exists but does not have valid key")
+                print(
+                    "Historic user {user} exists but does not have valid key".format(
+                        user=user
+                    )
+                )
                 return True
 
             print(
-                f"User {user} exists but does not have valid key and was not created by kissh"
+                "User {user} exists but does not have valid key and was not created by kissh".format(
+                    user=user
+                )
             )
     else:
-        print(f"User {user} is expected but does not exist on system")
+        print("User {user} is expected but does not exist on system".format(user=user))
 
     return False
 
@@ -164,7 +180,7 @@ def get_users(path):
         user, _, fingerprint = line.partition(":")
 
         if not fingerprint:
-            print(f"Invalid line '{line}' in users file")
+            print("Invalid line '{line}' in users file".format(line=line))
         else:
             yield user, fingerprint
 
@@ -219,13 +235,18 @@ def update_user(userfile, user, public_key):
 
     # validate the key is set properly on Github
     if get_github_key(user, fingerprint) is None:
-        print(f"{keyfile} is not registerd for Github user {user}")
+        print(
+            "{public_key} is not registered for Github user {user}".format(
+                public_key=public_key,
+                user=user,
+            )
+        )
         return 1
 
     users = dict(get_users(userfile))
     # update user's fingerprint
     users[user] = fingerprint
-    content = "\n".join(f"{u}:{f}" for u, f in users.items())
+    content = "\n".join("{u}:{f}".format(u=u, f=f) for u, f in users.items())
     userfile.write_text(content)
 
 
@@ -240,7 +261,6 @@ def get_parser():
 
     subparsers = parser.add_subparsers(
         title="available commands",
-        required=True,
         description="",
         metavar="COMMAND",
     )
