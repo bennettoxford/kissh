@@ -55,4 +55,3 @@ echo "$username:SHA256:badfingerprint" > "$userfile"
 
 # check the authorized_keys is empty
 test "$(cat "$authorized_keys")" = ""
-echo "test: $?"

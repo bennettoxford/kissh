@@ -14,7 +14,7 @@
 #   --tmpfs /tmp --tmpfs /run --tmpfs /run/lock \
 #   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 #
-ARG BASE=jrei/systemd-ubuntu:20.04
+ARG BASE=you-must-set-base-image-explictly
 FROM $BASE
 
 # we need sudo and ssh installed
