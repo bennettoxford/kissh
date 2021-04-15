@@ -18,4 +18,4 @@ ARG BASE=you-must-set-base-image-explictly
 FROM $BASE
 
 # we need sudo and ssh installed
-RUN apt-get update && apt-get install -y sudo ssh openssh-server python3 python3-requests
+RUN apt-get update && apt-get install -y sudo ssh openssh-server python3 python3-requests git
