@@ -21,7 +21,7 @@ kissh-test-image-debian:
 .PHONY: test
 test: kissh-test-image-ubuntu kissh-test-image-debian
 	$(MAKE) $(TESTS) DISTRO=ubuntu
-	$(MAKE) $(TESTS) DISTO=debian
+	$(MAKE) $(TESTS) DISTRO=debian
 
 
 .PHONY: $(TESTS)

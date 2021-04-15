@@ -236,7 +236,7 @@ def update_user(userfile, user, public_key):
     # validate the key is set properly on Github
     if get_github_key(user, fingerprint) is None:
         print(
-            "{public_key} is not registerd for Github user {user}".format(
+            "{public_key} is not registered for Github user {user}".format(
                 public_key=public_key,
                 user=user,
             )
