@@ -8,6 +8,7 @@ echo "Running ssh management to check it works..."
 systemctl enable "$PWD/kissh.service"
 systemctl enable "$PWD/kissh.timer"
 systemctl start kissh.timer
-systemctl start kissh.service
+git branch
+systemctl start kissh.service || { journalctl -u kissh.service; exit 1; }
 
 echo "Installed systemd timer to run kissh regularly"
