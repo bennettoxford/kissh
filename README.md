@@ -123,23 +123,29 @@ connection afterwards.
 
 ## The kissh agent
 
-To install kissh on a machine, you will need git installed. Checkout this
-repository, then run:
+To install kissh on a machine, you will need git and python3.5+ installed.
+Checkout this repository as root:
 
-    ./install.sh
+    sudo git clone https://github.com/ebmdatalab/kissh /srv/kissh
 
-This will install this repo in /srv/kissh, and set up a systemd timer to run
-the agent periodically. When run, the kissh agent will ensure users and keys
-are up to date, creating new users if necessary. It will never remove users,
-only their keys. It ensures that **only** the keys approved in this repo are
-installed - all other SSH keys will be removed, by design.
+Then run the install script:
+
+    cd /srv/kissh
+    sudo ./install.sh
+
+This will do an initital run of kissh, validate it, and install a systemd timer
+to run the kissh agent periodically. When run, the kissh agent will first
+update itself to the latest master, and ensure users and keys are up to date,
+creating new users if necessary. It will never remove users, only their keys.
+It ensures that **only** the keys approved in this repo are installed - all
+other SSH keys will be removed, by design.
 
 Before running, the kissh service will update itself to a clean checkout of the
 main branch of the repo, in order to get new user and keys info, as well as
 update itself to the latest version. It will discard any local changes, by
 design.
 
-The kissh agent has help text:
+The kissh agent has help text for futher information:
 
     ./kissh --help
 
@@ -156,6 +162,6 @@ To run specific test:
 
     make tests/install.sh
 
-To run test and drop into shell after running:
+To run test and drop into shell after running test:
 
     make tests/install.sh DEBUG=1

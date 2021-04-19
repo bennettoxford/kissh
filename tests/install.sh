@@ -1,11 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
+cp -a . /srv/kissh
+cd /srv/kissh
+# ensure remote is http based
+git remote set-url origin https://github.com/ebmdatalab/kissh
+
 ./install.sh
 
 sleep 1
 
-/srv/kissh/kissh validate
+./kissh validate
 
 systemctl status kissh.timer
 
