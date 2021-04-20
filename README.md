@@ -48,6 +48,8 @@ added:
 
     git clone git@github.com:ebmdatalab/kissh.git
     cd kissh
+    
+    pip install requests
 
     ./kissh update YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519.pub
 
