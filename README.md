@@ -98,7 +98,7 @@ Host *.ebmdatalab.net *.opensafely.org
     IdentityFile ~/.ssh/datalab_ed25519
 ```
 
-This should allow you to just do `ssh somehost.embdatalab.net` and it Just Works.
+This should allow you to just do `ssh somehost.ebmdatalab.net` and it Just Works.
 
 
 ## Key Compromise and Rotation
