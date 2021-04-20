@@ -7,10 +7,7 @@ import subprocess
 import sys
 import traceback
 from pathlib import Path
-
-import requests
-
-session = requests.Session()
+from urllib.request import Request, urlopen
 
 # overridable by env var so that we can test
 KEY_URL = os.environ.get("KISSH_KEY_URL", "https://github.com/{user}.keys")
@@ -97,11 +94,18 @@ def get_fingerprint(key):
 
 def get_github_key(user, fingerprint):
     """Get the key for a Github user key that matches given fingerprint."""
-    r = session.get(KEY_URL.format(user=user))
-    r.raise_for_status()
+    url = KEY_URL.format(user=user)
+    request = Request(url=url, method="GET")
+
+    response = urlopen(request)
+    body = response.read().decode("utf8")
+    if response.status != 200:
+        raise RuntimeError(
+            "Could not get public key from {url}\n{body}".format(user=user, body=body)
+        )
 
     # Find the correct key by its fingerprint
-    for key in r.text.splitlines():
+    for key in body.splitlines():
         if get_fingerprint(key) == fingerprint:
             return key
 
@@ -247,7 +251,7 @@ def update_user(userfile, user, public_key):
     # update user's fingerprint
     users[user] = fingerprint
     content = "\n".join("{u}:{f}".format(u=u, f=f) for u, f in users.items())
-    userfile.write_text(content)
+    userfile.write_text(content + "\n")
 
 
 def get_parser():
