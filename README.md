@@ -46,10 +46,11 @@ the comment, e.g.
 Clone this repo and run the following to a ensure your new keys fingerprint is
 added:
 
+    GITHUB_USERNAME=<YOUR_GITHUB_USERNAME>
     git clone git@github.com:ebmdatalab/kissh.git
     cd kissh
 
-    ./kissh update YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519.pub
+    ./kissh update $GITHUB_USERNAME ~/.ssh/datalab_ed25519.pub
 
 This is should ensure your user has a correct entry with key fingerprint in the
 `passwd` file, marking this key as your current Datalab key.
@@ -57,10 +58,10 @@ This is should ensure your user has a correct entry with key fingerprint in the
 You need to add and commit this, but you MUST sign it with your registered
 Github GPG key, or else the commit will be blocked.
 
-    git checkout -b "add-$USER-key"
+    git checkout -b "add-$GITHUB_USERNAME-key"
     git add -p
-    git commit -m "Add SSH key"
-    git push --set-upstream origin "add-$USER-key"
+    git commit -m "Add $GITHUB_USERNAME SSH key"
+    git push --set-upstream origin "add-$GITHUB_USERNAME-key"
 
 Open a PR and request a review in the #tech-code-reviews channel. Once
 this is reviewed and merged, after a short time your account and key
