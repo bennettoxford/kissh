@@ -7,7 +7,7 @@ April 2021.
 
 We use SSH as primary access to all our Datalab infrastructure and as well as
 parts of the OpenSAFELY backend infrastructure. We also use it for Github
-authentication for cloning and pushing. 
+authentication for cloning and pushing.
 
 Thus, keeping our SSH keys and usage secure is very important. This document
 describes our policy for SSH key management.
@@ -33,7 +33,7 @@ We use Github as a key distribution mechanism. You should add the contents of
 your public key file (e.g. `~/.ssh/datalab_ed25519.pub`) to your Github
 account:
 
-[https://github.com/settings/keys](https://github.com/settings/keys)
+[ https://github.com/settings/keys ](https://github.com/settings/keys)
 
 Github doesn't preserve the key comment, so we recommend titling the key with
 the comment, e.g.
@@ -46,7 +46,10 @@ the comment, e.g.
 Clone this repo and run the following to a ensure your new keys fingerprint is
 added:
 
-    ./kissh update YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519
+    git clone git@github.com:ebmdatalab/kissh.git
+    cd kissh
+
+    ./kissh update YOUR_GITHUB_USERNAME ~/.ssh/datalab_ed25519.pub
 
 This is should ensure your user has a correct entry with key fingerprint in the
 `passwd` file, marking this key as your current Datalab key.
@@ -54,7 +57,13 @@ This is should ensure your user has a correct entry with key fingerprint in the
 You need to add and commit this, but you MUST sign it with your registered
 Github GPG key, or else the commit will be blocked.
 
-Once this is reviewed and merged, after a short time your account and key
+    git checkout -b "add-$USER-key"
+    git add -p
+    git commit -m "Add SSH key"
+    git push --set-upstream origin "add-$USER-key"
+
+Open a PR and request a review in the #tech-code-reviews channel. Once
+this is reviewed and merged, after a short time your account and key
 should be available to log in with on all our servers.
 
 ## Sudo Access and Passwords
