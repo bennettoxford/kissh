@@ -4,10 +4,7 @@ Wants=kissh.timer
 
 [Service]
 WorkingDirectory=/srv/kissh
-# Note: these are commented out initially, as they won't work until the initial
-# version is merged!
-#ExecStartPre=git reset --hard
-#ExecStartPre=git pull https://github.com/ebmdatalab/kissh
+ExecStartPre=/srv/kissh/update.sh
 ExecStart=/srv/kissh/kissh apply
 Type=oneshot
 

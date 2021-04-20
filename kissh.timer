@@ -5,6 +5,7 @@ Requires=kissh.service
 [Timer]
 # prime number to avoid synchronisation
 OnActiveSec=17m
+Unit=kissh.service
 
 [Install]
 WantedBy=timers.target
