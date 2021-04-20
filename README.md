@@ -22,7 +22,7 @@ the key's comment.
 
 To generate such a key, you can run this in a terminal:
 
-    ssh-keygen -t ed25519 -C "YOUREMAIL@thedatalab.org:$(date --iso-8601)" -f ~/.ssh/datalab_ed25519
+    ssh-keygen -t ed25519 -C "YOUREMAIL@thedatalab.org:$(date +%Y-%m-%d)" -f ~/.ssh/datalab_ed25519
 
 Note: you MUST enter a strong password when prompted.
 
