@@ -4,7 +4,7 @@ Requires=kissh.service
 
 [Timer]
 # prime number to avoid synchronisation
-OnActiveSec=17m
+OnUnitActiveSec=17min
 Unit=kissh.service
 
 [Install]
