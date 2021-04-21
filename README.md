@@ -96,6 +96,7 @@ accessing Datalab systems with the following snippet in `~/.ssh/config`
 Host *.ebmdatalab.net *.opensafely.org
     User YOUR_GITHUB_USERNAME
     IdentityFile ~/.ssh/datalab_ed25519
+    IdentitiesOnly yes
 ```
 
 This should allow you to just do `ssh somehost.ebmdatalab.net` and it Just Works.
