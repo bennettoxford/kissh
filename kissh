@@ -65,8 +65,16 @@ class User:
 
     @classmethod
     def create(cls, username):
+        # --force-badname allows capital letters in the username. We've already vetted the username is real.
         subprocess.run(
-            ["adduser", username, "--gecos=''", "--disabled-password"], check=True
+            [
+                "adduser",
+                username,
+                "--gecos=''",
+                "--disabled-password",
+                "--force-badname",
+            ],
+            check=True,
         )
         subprocess.run(["adduser", username, "sudo"], check=True)
         # force password setting on first ssh login, by deleting and expiring their
