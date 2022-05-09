@@ -130,6 +130,12 @@ def manage_user(username, fingerprint):
     key = None
     if fingerprint:
         key = get_github_key(username, fingerprint)
+        if not key:
+            print(
+                "Key fingerprint {} not found on github for user {}".format(
+                    fingerprint, username
+                )
+            )
 
     if key:
         # we have a valid key, so we can create the user now if needed
@@ -140,9 +146,9 @@ def manage_user(username, fingerprint):
         if user:
             # remove all keys from users authorized_keys
             user.write_keys("")
-            print("Removed SSH keys for user {user}".format(user=user))
+            print("Removed SSH key for user {user}".format(user=user))
         else:
-            print("User {user} does not exist and no valid key found".format(user=user))
+            print("User {username} does not exist".format(username=username))
 
 
 def validate_user(username, fingerprint, historic_user):
@@ -176,7 +182,11 @@ def validate_user(username, fingerprint, historic_user):
                 )
             )
     else:
-        print("User {user} is expected but does not exist on system".format(user=user))
+        print(
+            "User {username} is expected but does not exist on system".format(
+                user=username
+            )
+        )
 
     return False
 
