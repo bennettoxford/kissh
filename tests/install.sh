@@ -2,6 +2,9 @@
 set -euo pipefail
 
 cp -a . /srv/kissh
+touch /srv/kissh/.testing
+chown -R root:root /srv/kissh
+
 cd /srv/kissh
 # ensure remote is http based
 git remote set-url origin https://github.com/ebmdatalab/kissh
