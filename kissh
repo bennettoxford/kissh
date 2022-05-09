@@ -158,7 +158,7 @@ def validate_user(username, fingerprint, historic_user):
     if user:
         if key:
             if get_fingerprint(user.authorized_keys.read_text()) == fingerprint:
-                print("User {user} exists has valid authorized_keys".format(user=user))
+                print("User {user} exists and has valid authorized_keys".format(user=user))
                 return True
             else:
                 print(
@@ -184,7 +184,7 @@ def validate_user(username, fingerprint, historic_user):
     else:
         print(
             "User {username} is expected but does not exist on system".format(
-                user=username
+                username=username
             )
         )
 

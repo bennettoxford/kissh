@@ -135,7 +135,7 @@ connection afterwards.
 ## The kissh agent
 
 To install kissh on a machine, you will need git and python3.5+ installed.
-Checkout this repository as root:
+Checkout this repository *as root*:
 
     sudo git clone https://github.com/ebmdatalab/kissh /srv/kissh
 
