@@ -50,7 +50,11 @@ class User:
     def write_keys(self, contents):
         """Write authorized_keys file contents, ensuring .ssh exists."""
         self.authorized_keys.parent.mkdir(exist_ok=True)
+        os.chown(str(self.authorized_keys.parent), self.info.pw_uid, self.info.pw_gid)
+        self.authorized_keys.parent.chmod(0o700)
         self.authorized_keys.write_text(contents)
+        os.chown(str(self.authorized_keys), self.info.pw_uid, self.info.pw_gid)
+        self.authorized_keys.chmod(0o600)
 
     def __str__(self):
         return self.username
