@@ -17,8 +17,19 @@ sleep 1
 
 systemctl status kissh.timer
 
-# because kissh.service is Type: oneshot, systemctl status will exit with a 3 (not running)
 systemctl is-enabled kissh.service
-set +e
-systemctl status kissh.service
-test $? = 3
+
+# because kissh.service is Type: oneshot, systemctl status will exit with a 3 (not running)
+code=0
+systemctl status kissh.service || code=$?
+test $code = 3
+
+# check a user's .ssh file perms
+while IFS= read -r user
+do
+    # %U = username
+    # %G = groupname
+    # %a = octal file permissions
+    test "$(stat --format '%U:%G:%a' "/home/$user/.ssh")" == "$user:$user:700"
+    test "$(stat --format '%U:%G:%a' "/home/$user/.ssh/authorized_keys")" == "$user:$user:600"
+done < <(awk -F: '{print $1}' passwd)
