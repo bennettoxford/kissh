@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run an ubuntu docker "VM", then run the passed command inside it.  The
+# Run an ubuntu podman "VM", then run the passed command inside it.  The
 # container is deleted when this script exits.
 #
 # Run with DEBUG=1 to run a shell inside the container after running your
@@ -18,17 +18,15 @@ fi
 
 # Launch a container running systemd
 CONTAINER="$(
-    docker run -d --rm \
-               --cap-add SYS_ADMIN --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-               -v "$PWD:/tests" "$TEST_IMAGE"
+    podman run -d --rm -v "$PWD:/tests" "$TEST_IMAGE"
 )"
 
-trap 'docker rm -f $CONTAINER >/dev/null' EXIT
+trap 'podman rm -f $CONTAINER' EXIT
 
 # run test script
 set +e # we handle the error manually
 echo -n "Running $1 in container..."
-docker exec -i -e SHELLOPTS=xtrace -e TEST=true -w /tests "$CONTAINER" "$SCRIPT" > "$LOG" 2>&1
+podman exec -i -e SHELLOPTS=xtrace -e TEST=true -w /tests "$CONTAINER" "$SCRIPT" > "$LOG" 2>&1
 success=$?
 
 set -e
@@ -50,7 +48,7 @@ fi
 
 if test -n "$DEBUG"; then
     echo "Running bash inside container (container will be deleted on exit)"
-    docker exec -it -e TEST=true -w /tests "$CONTAINER" bash
+    podman exec -it -e TEST=true -w /tests "$CONTAINER" bash
 fi
 
 exit $success
