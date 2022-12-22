@@ -12,9 +12,9 @@ lint:
 
 .PHONY: ubuntu-kissh-test-image debian-kissh-test-image
 kissh-test-image-ubuntu:
-	docker build . -t $@ --build-arg BASE=jrei/systemd-ubuntu:20.04
+	podman build . -t $@ --build-arg BASE=jrei/systemd-ubuntu:20.04
 kissh-test-image-debian:
-	docker build . -t $@ --build-arg BASE=jrei/systemd-debian:9
+	podman build . -t $@ --build-arg BASE=jrei/systemd-debian:9
 
 
 # run all tests
@@ -30,4 +30,4 @@ $(TESTS):
 
 
 clean:
-	docker rmi kissh-test-image-ubuntu kissh-test-image-debian
+	podman rmi kissh-test-image-ubuntu kissh-test-image-debian
