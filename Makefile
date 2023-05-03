@@ -12,9 +12,9 @@ lint:
 
 .PHONY: ubuntu-kissh-test-image debian-kissh-test-image
 kissh-test-image-ubuntu:
-	podman build . -t $@ --build-arg BASE=jrei/systemd-ubuntu:20.04
+	podman build . -t $@ --build-arg BASE=jrei/systemd-ubuntu:22.04
 kissh-test-image-debian:
-	podman build . -t $@ --build-arg BASE=jrei/systemd-debian:9
+	podman build . -t $@ --build-arg BASE=jrei/systemd-debian:10
 
 
 # run all tests
