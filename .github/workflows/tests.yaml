@@ -13,11 +13,11 @@ jobs:
     name: Run lint and tests
     steps:
     - name: Checkout main, so we have it to refer to
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
           ref: main
     - name: Checkout PR branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install test depenencies
       run: sudo apt-get install -y shellcheck podman && pip3 install black
     - name: Add black to path
