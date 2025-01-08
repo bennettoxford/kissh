@@ -47,7 +47,7 @@ Clone this repo and run the following to a ensure your new keys fingerprint is
 added:
 
     GITHUB_USERNAME=<YOUR_GITHUB_USERNAME>
-    git clone git@github.com:ebmdatalab/kissh.git
+    git clone git@github.com:bennettoxford/kissh.git
     cd kissh
 
     ./kissh update $GITHUB_USERNAME ~/.ssh/datalab_ed25519.pub
@@ -137,7 +137,7 @@ connection afterwards.
 To install kissh on a machine, you will need git and python3.5+ installed.
 Checkout this repository *as root*:
 
-    sudo git clone https://github.com/ebmdatalab/kissh /srv/kissh
+    sudo git clone https://github.com/bennettoxford/kissh /srv/kissh
 
 Then run the install script:
 

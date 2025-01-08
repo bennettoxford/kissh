@@ -7,7 +7,7 @@ chown -R root:root /srv/kissh
 
 cd /srv/kissh
 # ensure remote is http based
-git remote set-url origin https://github.com/ebmdatalab/kissh
+git remote set-url origin https://github.com/bennettoxford/kissh
 
 ./install.sh
 
