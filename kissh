@@ -189,7 +189,7 @@ def validate_user(username, fingerprint, historic_user):
             )
     else:
         print(
-            "User {username} is expected but does not exist on system".format(
+            "User {username} is expected but does not exist on system (has GitHub key expired?)".format(
                 username=username
             )
         )
