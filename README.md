@@ -55,8 +55,7 @@ added:
 This is should ensure your user has a correct entry with key fingerprint in the
 `passwd` file, marking this key as your current Datalab key.
 
-You need to add and commit this, but you MUST sign it with your registered
-Github GPG key, or else the commit will be blocked.
+Next, add the public key to this repo:
 
     git checkout -b "add-$GITHUB_USERNAME-key"
     git add -p
