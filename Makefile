@@ -14,7 +14,7 @@ lint:
 kissh-test-image-ubuntu:
 	podman build . -t $@ --build-arg BASE=docker.io/jrei/systemd-ubuntu:22.04
 kissh-test-image-debian:
-	podman build . -t $@ --build-arg BASE=docker.io/jrei/systemd-debian:10
+	podman build . -t $@ --build-arg BASE=docker.io/jrei/systemd-debian:12
 
 
 # run all tests
