@@ -55,8 +55,7 @@ added:
 This is should ensure your user has a correct entry with key fingerprint in the
 `passwd` file, marking this key as your current Datalab key.
 
-You need to add and commit this, but you MUST sign it with your registered
-Github GPG key, or else the commit will be blocked.
+Next, add the public key to this repo:
 
     git checkout -b "add-$GITHUB_USERNAME-key"
     git add -p
@@ -66,6 +65,21 @@ Github GPG key, or else the commit will be blocked.
 Open a PR and request a review in the #tech-code-reviews channel. Once
 this is reviewed and merged, after a short time your account and key
 should be available to log in with on all our servers.
+
+## Local SSH Config
+
+You can use your local SSH config to ensure you use the right username and key when
+accessing Datalab systems with the following snippet in `~/.ssh/config`
+
+```
+Host *.ebmdatalab.net *.opensafely.org
+    User YOUR_GITHUB_USERNAME
+    IdentityFile ~/.ssh/datalab_ed25519
+    IdentitiesOnly yes
+```
+
+This should allow you to just do `ssh somehost.ebmdatalab.net` and it Just Works.
+
 
 ## Sudo Access and Passwords
 
@@ -85,22 +99,6 @@ tech team to run the following on that server:
     sudo passwd -de YOUR_GITHUB_USERNAME
 
 This will delete your password and force a reset next time you SSH in.
-
-## Local SSH Config
-
-You can use your local SSH config to ensure you use the right username and key when
-accessing Datalab systems with the following snippet in `~/.ssh/config`
-
-
-```
-Host *.ebmdatalab.net *.opensafely.org
-    User YOUR_GITHUB_USERNAME
-    IdentityFile ~/.ssh/datalab_ed25519
-    IdentitiesOnly yes
-```
-
-This should allow you to just do `ssh somehost.ebmdatalab.net` and it Just Works.
-
 
 ## Key Compromise and Rotation
 
