@@ -62,7 +62,7 @@ Next, add the public key to this repo:
     git commit -m "Add $GITHUB_USERNAME SSH key"
     git push --set-upstream origin "add-$GITHUB_USERNAME-key"
 
-Open a PR and request a review in the #tech-code-reviews channel. Once
+Open a PR and request a review in your team's #code-reviews channel. Once
 this is reviewed and merged, after a short time your account and key
 should be available to log in with on all our servers.
 
