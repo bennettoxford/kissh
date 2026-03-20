@@ -13,7 +13,8 @@ git remote set-url origin https://github.com/bennettoxford/kissh
 
 sleep 1
 
-./kissh validate
+# print this, but don't fail, as some keys may have expired
+./kissh validate || true
 
 systemctl status kissh.timer
 
