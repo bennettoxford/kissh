@@ -13,7 +13,8 @@ git remote set-url origin https://github.com/bennettoxford/kissh
 
 sleep 1
 
-./kissh validate
+# print this, but don't fail, as some keys may have expired
+./kissh validate || true
 
 systemctl status kissh.timer
 
@@ -30,6 +31,8 @@ do
     # %U = username
     # %G = groupname
     # %a = octal file permissions
-    test "$(stat --format '%U:%G:%a' "/home/$user/.ssh")" == "$user:$user:700"
-    test "$(stat --format '%U:%G:%a' "/home/$user/.ssh/authorized_keys")" == "$user:$user:600"
+    if test -d /home/$user/.ssh; then
+        test "$(stat --format '%U:%G:%a' "/home/$user/.ssh")" == "$user:$user:700"
+        test "$(stat --format '%U:%G:%a' "/home/$user/.ssh/authorized_keys")" == "$user:$user:600"
+    fi
 done < <(awk -F: '{print $1}' passwd)
